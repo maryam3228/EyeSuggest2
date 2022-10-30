@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "175300630721",
+    "firebase_url": "https://eyesuggest-96e9a-default-rtdb.firebaseio.com",
+    "project_id": "eyesuggest-96e9a",
+    "storage_bucket": "eyesuggest-96e9a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:175300630721:android:5440c25980cb3cfc279c40",
+        "android_client_info": {
+          "package_name": "com.example.eye_suggest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "175300630721-9dl2atlv8bpomr0q44fg3ptn2h2j6dcc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.eye_suggest",
+            "certificate_hash": "b594c95323fd6f96c6b85238701453b7e03a3833"
+          }
+        },
+        {
+          "client_id": "175300630721-bhlvohlkuevg15po1ltgsdtq4ce44ur5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBUGRUXHB0Mr7PzAGr926i6KmE5Epp0DjM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "175300630721-bhlvohlkuevg15po1ltgsdtq4ce44ur5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
