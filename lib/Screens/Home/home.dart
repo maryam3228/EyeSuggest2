@@ -1,6 +1,7 @@
 import 'dart:io';
 
 // import 'package:camera/camera.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_ml_vision/google_ml_vision.dart';
 import 'package:image_picker/image_picker.dart';
@@ -21,31 +22,7 @@ class _HomePageState extends State<HomePage> {
   File? _imageFile;
   List<Face>? _faces;
 
-  // CameraController? _camera;
-  // bool _cameraInitialized = false;
-  // CameraImage? _savedImage;
-
-  // void _initializeCamera() async {
-  //   // Get list of cameras of the device
-  //   List<CameraDescription> cameras = await availableCameras();
-  //   // Create the CameraController
-  //   _camera = CameraController(cameras[1], ResolutionPreset.veryHigh);
-  //   // Initialize the CameraController
-  //   _camera!.initialize().then((_) async {
-  //     // Start ImageStream
-  //     await _camera!
-  //         .startImageStream((CameraImage image) => _processCameraImage(image));
-  //     setState(() {
-  //       _cameraInitialized = true;
-  //     });
-  //   });
-  // }
-
-  // void _processCameraImage(CameraImage image) async {
-  //   setState(() {
-  //     _savedImage = image;
-  //   });
-  // }
+  var _isLoading = false;
 
   void _getImageAndDetectFaces() async {
     // ignore: invalid_use_of_visible_for_testing_member
@@ -71,25 +48,9 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _initializeCamera();
-  // }
-
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Scaffold(
-  //     appBar: AppBar(
-  //       title: const Text('Eye Suggest'),
-  //     ),
-  //     body: Center(
-  //       child: (_cameraInitialized)
-  //           ? CameraPreview(_camera!)
-  //           : const CircularProgressIndicator(),
-  //     ),
-  //   );
-  // }
+  Future<void> _onSignOut() async {
+    await FirebaseAuth.instance.signOut();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -98,18 +59,30 @@ class _HomePageState extends State<HomePage> {
         title: Text(
           widget.title!,
         ),
+        actions: [
+          IconButton(
+            onPressed: _onSignOut,
+            icon: const Icon(
+              Icons.logout_rounded,
+            ),
+          ),
+        ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(32.0),
-        child: _imageFile != null && _faces != null
-            ? ImageAndFaces(
-                faces: _faces!,
-                imageFile: _imageFile!,
-              )
-            : const Center(
-                child: Text('Select an image'),
-              ),
-      ),
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : Padding(
+              padding: const EdgeInsets.all(32.0),
+              child: _imageFile != null && _faces != null
+                  ? ImageAndFaces(
+                      faces: _faces!,
+                      imageFile: _imageFile!,
+                    )
+                  : const Center(
+                      child: Text('Select an image'),
+                    ),
+            ),
       floatingActionButton: FloatingActionButton(
         onPressed: _getImageAndDetectFaces,
         child: const Icon(

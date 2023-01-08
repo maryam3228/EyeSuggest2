@@ -19,6 +19,7 @@ class _SignUpState extends State<SignUp> {
   var _password = "";
   var _name = "";
   var _confirmPassword = "";
+  var _isLoading = false;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final _authentication = FirebaseAuth.instance;
@@ -38,6 +39,9 @@ class _SignUpState extends State<SignUp> {
 
   void _onSignUp() {
     if (_canLogin()) {
+      setState(() {
+        _isLoading = true;
+      });
       _authentication
           .createUserWithEmailAndPassword(
         email: _email,
@@ -52,6 +56,9 @@ class _SignUpState extends State<SignUp> {
               'password': _password.hashCode,
             },
           );
+          setState(() {
+            _isLoading = false;
+          });
           Fluttertoast.showToast(msg: 'Sign Up Successfull');
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
@@ -65,6 +72,9 @@ class _SignUpState extends State<SignUp> {
         },
       ).catchError(
         (error) {
+          setState(() {
+            _isLoading = false;
+          });
           Fluttertoast.showToast(msg: error.message);
         },
       );
@@ -363,38 +373,41 @@ class _SignUpState extends State<SignUp> {
                       ),
                     ),
                   ),
-                  SizedBox(
-                    height: 50,
-                    child: TextButton(
-                      child: const Text(
-                        'Sign Up',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      style: ButtonStyle(
-                        shape: MaterialStateProperty.all(
-                          const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(20.0),
+                  _isLoading
+                      ? const CircularProgressIndicator()
+                      : SizedBox(
+                          height: 50,
+                          child: TextButton(
+                            child: const Text(
+                              'Sign Up',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all(
+                                const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(20.0),
+                                  ),
+                                ),
+                              ),
+                              fixedSize: MaterialStateProperty.all(
+                                Size.fromWidth(
+                                    MediaQuery.of(context).size.width),
+                              ),
+                              foregroundColor: MaterialStateProperty.all(
+                                Colors.white,
+                              ),
+                              backgroundColor: MaterialStateProperty.all(
+                                Theme.of(context).primaryColor,
+                              ),
+                              elevation: MaterialStateProperty.all(2),
+                            ),
+                            onPressed: _onSignUp,
                           ),
                         ),
-                        fixedSize: MaterialStateProperty.all(
-                          Size.fromWidth(MediaQuery.of(context).size.width),
-                        ),
-                        foregroundColor: MaterialStateProperty.all(
-                          Colors.white,
-                        ),
-                        backgroundColor: MaterialStateProperty.all(
-                          Theme.of(context).primaryColor,
-                        ),
-                        elevation: MaterialStateProperty.all(2),
-                      ),
-                      onPressed: _onSignUp,
-                    ),
-                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

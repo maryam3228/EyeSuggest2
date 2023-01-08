@@ -16,6 +16,7 @@ class SignIn extends StatefulWidget {
 class _SignInState extends State<SignIn> {
   var _email = "";
   var _password = "";
+  var _isLoading = false;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final _authentication = FirebaseAuth.instance;
@@ -31,6 +32,9 @@ class _SignInState extends State<SignIn> {
 
   void _onSignIn() {
     if (_canLogin()) {
+      setState(() {
+        _isLoading = true;
+      });
       _authentication
           .signInWithEmailAndPassword(
         email: _email,
@@ -38,6 +42,9 @@ class _SignInState extends State<SignIn> {
       )
           .then((value) {
         Fluttertoast.showToast(msg: 'Login Successfull');
+        setState(() {
+          _isLoading = false;
+        });
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) {
@@ -49,6 +56,9 @@ class _SignInState extends State<SignIn> {
         );
       }).catchError(
         (error) {
+          setState(() {
+            _isLoading = false;
+          });
           Fluttertoast.showToast(
             msg: error.message,
           );
@@ -239,38 +249,41 @@ class _SignInState extends State<SignIn> {
                       ),
                     ),
                   ),
-                  SizedBox(
-                    height: 50,
-                    child: TextButton(
-                      child: const Text(
-                        'Sign In',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      style: ButtonStyle(
-                        shape: MaterialStateProperty.all(
-                          const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(20.0),
+                  _isLoading
+                      ? const CircularProgressIndicator()
+                      : SizedBox(
+                          height: 50,
+                          child: TextButton(
+                            child: const Text(
+                              'Sign In',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all(
+                                const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(20.0),
+                                  ),
+                                ),
+                              ),
+                              fixedSize: MaterialStateProperty.all(
+                                Size.fromWidth(
+                                    MediaQuery.of(context).size.width),
+                              ),
+                              foregroundColor: MaterialStateProperty.all(
+                                Colors.white,
+                              ),
+                              backgroundColor: MaterialStateProperty.all(
+                                Theme.of(context).primaryColor,
+                              ),
+                              elevation: MaterialStateProperty.all(2),
+                            ),
+                            onPressed: _onSignIn,
                           ),
                         ),
-                        fixedSize: MaterialStateProperty.all(
-                          Size.fromWidth(MediaQuery.of(context).size.width),
-                        ),
-                        foregroundColor: MaterialStateProperty.all(
-                          Colors.white,
-                        ),
-                        backgroundColor: MaterialStateProperty.all(
-                          Theme.of(context).primaryColor,
-                        ),
-                        elevation: MaterialStateProperty.all(2),
-                      ),
-                      onPressed: _onSignIn,
-                    ),
-                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

@@ -42,12 +42,12 @@ class MyApp extends StatelessWidget {
       home: StreamBuilder(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, user) {
-          if (!user.hasData) {
-            return const SignIn();
-          } else {
+          if (user.hasData) {
             return const HomePage(
               title: 'Eye Suggest',
             );
+          } else {
+            return const SignIn();
           }
         },
       ),
