@@ -7,11 +7,10 @@ import 'package:image_picker/image_picker.dart';
 
 class HomePage extends StatefulWidget {
   final String? title;
-  // final List<CameraDescription>? cameras;
+
   const HomePage({
     Key? key,
-    this.title,
-    // this.cameras,
+    @required this.title,
   }) : super(key: key);
 
   @override

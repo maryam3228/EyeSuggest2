@@ -1,15 +1,26 @@
 import 'package:eye_suggest/Screens/Authentication/signup.dart';
 import 'package:eye_suggest/Screens/Home/home.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
-class SignIn extends StatelessWidget {
-  SignIn({
+class SignIn extends StatefulWidget {
+  const SignIn({
     Key? key,
   }) : super(key: key);
 
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  @override
+  State<SignIn> createState() => _SignInState();
+}
 
-  bool _canLogin(BuildContext context) {
+class _SignInState extends State<SignIn> {
+  var _email = "";
+  var _password = "";
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final _authentication = FirebaseAuth.instance;
+
+  bool _canLogin() {
     FocusScope.of(context).unfocus();
     var isValid = _formKey.currentState!.validate();
     if (isValid) {
@@ -18,20 +29,42 @@ class SignIn extends StatelessWidget {
     return isValid;
   }
 
+  void _onSignIn() {
+    if (_canLogin()) {
+      _authentication
+          .signInWithEmailAndPassword(
+        email: _email,
+        password: _password,
+      )
+          .then((value) {
+        Fluttertoast.showToast(msg: 'Login Successfull');
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) {
+              return const HomePage(
+                title: 'EyeSuggest',
+              );
+            },
+          ),
+        );
+      }).catchError(
+        (error) {
+          Fluttertoast.showToast(
+            msg: error.message,
+          );
+        },
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    var _email = "";
-    var _password = "";
-
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
           children: [
             Container(
               height: MediaQuery.of(context).size.height * 0.2,
-              // margin: const EdgeInsets.only(
-              //   top: 50.0,
-              // ),
               padding: const EdgeInsets.all(8.0),
               child: Image.asset('assets/images/app-bar.png'),
             ),
@@ -102,6 +135,26 @@ class SignIn extends StatelessWidget {
                                   color: Color.fromRGBO(33, 111, 182, 1),
                                 ),
                               ),
+                              errorBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(
+                                    20.0,
+                                  ),
+                                ),
+                                borderSide: BorderSide(
+                                  color: Colors.red,
+                                ),
+                              ),
+                              focusedErrorBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(
+                                    20.0,
+                                  ),
+                                ),
+                                borderSide: BorderSide(
+                                  color: Colors.red,
+                                ),
+                              ),
                             ),
                             validator: (value) {
                               if (value!.isEmpty) {
@@ -140,6 +193,26 @@ class SignIn extends StatelessWidget {
                                 ),
                                 borderSide: BorderSide(
                                   color: Color.fromRGBO(33, 111, 182, 1),
+                                ),
+                              ),
+                              errorBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(
+                                    20.0,
+                                  ),
+                                ),
+                                borderSide: BorderSide(
+                                  color: Colors.red,
+                                ),
+                              ),
+                              focusedErrorBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(
+                                    20.0,
+                                  ),
+                                ),
+                                borderSide: BorderSide(
+                                  color: Colors.red,
                                 ),
                               ),
                             ),
@@ -195,20 +268,7 @@ class SignIn extends StatelessWidget {
                         ),
                         elevation: MaterialStateProperty.all(2),
                       ),
-                      onPressed: () {
-                        if (_canLogin(context)) {
-                          Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(
-                              builder: (context) {
-                                return const HomePage(
-                                  title: 'EyeSuggest',
-                                  // cameras: cameras,
-                                );
-                              },
-                            ),
-                          );
-                        }
-                      },
+                      onPressed: _onSignIn,
                     ),
                   ),
                   Row(
@@ -226,7 +286,7 @@ class SignIn extends StatelessWidget {
                           Navigator.of(context).pushReplacement(
                             MaterialPageRoute(
                               builder: (context) {
-                                return Authentication();
+                                return const SignUp();
                               },
                             ),
                           );
