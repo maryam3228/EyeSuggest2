@@ -49,7 +49,7 @@ class _SignUpState extends State<SignUp> {
       )
           .then(
         (value) {
-          FirebaseFirestore.instance.collection('Users').doc(_name).set(
+          FirebaseFirestore.instance.collection('Users').doc(_email).set(
             {
               'name': _name,
               'email': _email,

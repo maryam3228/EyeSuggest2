@@ -1,10 +1,6 @@
-import 'dart:io';
-
-// import 'package:camera/camera.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_ml_vision/google_ml_vision.dart';
-import 'package:image_picker/image_picker.dart';
 
 class HomePage extends StatefulWidget {
   final String? title;
@@ -19,35 +15,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  File? _imageFile;
-  List<Face>? _faces;
-
-  var _isLoading = false;
-
-  void _getImageAndDetectFaces() async {
-    // ignore: invalid_use_of_visible_for_testing_member
-    final imageFile = await ImagePicker.platform.pickImage(
-      source: ImageSource.gallery,
-    );
-    final image = GoogleVisionImage.fromFile(File(imageFile!.path));
-    final faceDetector = GoogleVision.instance.faceDetector(
-      const FaceDetectorOptions(
-        mode: FaceDetectorMode.accurate,
-        enableClassification: true,
-        enableContours: true,
-        enableLandmarks: true,
-        enableTracking: true,
-      ),
-    );
-    List<Face> faces = await faceDetector.processImage(image);
-    if (mounted) {
-      setState(() {
-        _imageFile = File(imageFile.path);
-        _faces = faces;
-      });
-    }
-  }
-
   Future<void> _onSignOut() async {
     await FirebaseAuth.instance.signOut();
   }
@@ -55,123 +22,163 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          widget.title!,
-        ),
-        actions: [
-          IconButton(
-            onPressed: _onSignOut,
-            icon: const Icon(
-              Icons.logout_rounded,
-            ),
-          ),
-        ],
-      ),
-      body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : Padding(
-              padding: const EdgeInsets.all(32.0),
-              child: _imageFile != null && _faces != null
-                  ? ImageAndFaces(
-                      faces: _faces!,
-                      imageFile: _imageFile!,
-                    )
-                  : const Center(
-                      child: Text('Select an image'),
+      backgroundColor: Colors.grey.shade300,
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  height: MediaQuery.of(context).size.height * 0.2,
+                  padding: const EdgeInsets.all(8.0),
+                  child: Image.asset('assets/images/app-bar.png'),
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.1,
+                  child: IconButton(
+                    onPressed: _onSignOut,
+                    icon: const Icon(
+                      Icons.logout_rounded,
                     ),
+                  ),
+                ),
+              ],
             ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _getImageAndDetectFaces,
-        child: const Icon(
-          Icons.camera_alt_rounded,
-        ),
-      ),
-    );
-  }
-}
-
-class ImageAndFaces extends StatelessWidget {
-  final File imageFile;
-  final List<Face> faces;
-
-  const ImageAndFaces({
-    Key? key,
-    required this.faces,
-    required this.imageFile,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        children: [
-          Expanded(
-            child: SizedBox(
-              child: Image.file(
-                imageFile,
-                fit: BoxFit.cover,
+            StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+              stream: FirebaseFirestore.instance
+                  .collection('Users')
+                  .doc(FirebaseAuth.instance.currentUser!.email)
+                  .get()
+                  .asStream(),
+              builder: ((context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else {
+                  var userData = snapshot.data!.data();
+                  return Container(
+                    alignment: Alignment.topLeft,
+                    margin: const EdgeInsets.only(
+                      left: 15,
+                    ),
+                    child: Text(
+                      "Hi, ${userData!['name']}",
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 2,
+                      ),
+                    ),
+                  );
+                }
+              }),
+            ),
+            Container(
+              width: MediaQuery.of(context).size.width * 0.85,
+              height: MediaQuery.of(context).size.height * 0.35,
+              decoration: const BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.white60,
+                    spreadRadius: 4,
+                  ),
+                ],
+                shape: BoxShape.circle,
+              ),
+              margin: const EdgeInsets.only(
+                top: 22,
+              ),
+              alignment: Alignment.center,
+              child: Image.asset(
+                'assets/images/homeScreen.png',
               ),
             ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          Expanded(
-            child: ListView(
-              children: faces
-                  .map<Widget>(
-                    (f) => FaceCoordinates(
-                      face: f,
+            Container(
+              margin: const EdgeInsets.only(
+                left: 15,
+              ),
+              alignment: Alignment.centerLeft,
+              child: const Text(
+                'Services',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 22,
+                  letterSpacing: 2,
+                ),
+              ),
+            ),
+            Card(
+              elevation: 8,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(12),
+                ),
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(12.0),
+                width: MediaQuery.of(context).size.width,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Text(
+                      'Measure Visual Acuity',
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
                     ),
-                  )
-                  .toList(),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      'Check your visual acuity',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class FaceCoordinates extends StatelessWidget {
-  final Face face;
-  const FaceCoordinates({
-    Key? key,
-    required this.face,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final pos = face.boundingBox;
-    final leftEye = face.getLandmark(FaceLandmarkType.leftEye);
-    final rightEye = face.getLandmark(FaceLandmarkType.rightEye);
-    return SizedBox(
-      width: MediaQuery.of(context).size.width,
-      child: Center(
-        child: ListTile(
-          leading: Text(
-            '${pos.top}, ${pos.left}, ${pos.bottom}, ${pos.right}',
-            style: const TextStyle(
-              fontSize: 12,
+            Card(
+              elevation: 8,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(12),
+                ),
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(12.0),
+                width: MediaQuery.of(context).size.width,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Text(
+                      'Simulate Vision',
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      'Your vision under simulation',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
-          title: Text(
-            """
-            leftEyeOpenProbability: ${face.leftEyeOpenProbability}
-            rightEyeOpenProbability: ${face.rightEyeOpenProbability}
-            smilingProbability: ${face.smilingProbability}
-            trackingId: ${face.trackingId}
-            leftEye: ${leftEye != null ? leftEye.position : 0}
-            rightEye: ${rightEye != null ? rightEye.position : 0}
-            """,
-            textAlign: TextAlign.left,
-            style: const TextStyle(
-              fontSize: 12,
-            ),
-          ),
+          ],
         ),
       ),
     );
