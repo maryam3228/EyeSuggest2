@@ -1,6 +1,8 @@
+import 'package:bulleted_list/bulleted_list.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../Measure/measure_acuity.dart';
 
@@ -17,8 +19,33 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final Uri _url =
+      Uri.parse('https://www.google.com/maps/search/ophthalmologist near me');
+
+  final _listOfInstructions = [
+    "It's recommended to take help of a companion in holding the smartphone 10 feet away from you. Maintaining the distance is crucial for the test.",
+    "The Snellen's Chart will be displayed on the screen.",
+    "Three letters will be displayed from each row of the Snellen's Chart.",
+    "Speak out the letter displayed on the screen. If you read correctly, the next letter will be shown.",
+    "For every row in the Snellen's Chart, three letters will be displayed one-by-one. After that, the size of the letters will decrease, i.e., next row of the Snellen's Chart will be displayed.",
+    "The test will end if you are unable to guess 2 out of 3 letters displayed.",
+    "If there is some disturbance in recognizing your speech, you will be prompted to try again speaking the letter displayed on the screen.",
+    "You are recommended to wear Bluetooth headphones for ease of speech recognition.",
+    "You have to strictly say the phrase 'THE LETTER X' while speaking out the letter identified, where X represents the letter that will be displayed on the screen during the test.",
+    "If you fail to speak out the complete phrase, you will be prompted to try again.",
+    "If at any point you are unable to read out the letters displayed, guess and speak out any random letter, in the same phrase format.",
+    "Once the test has successfully completed, the score will be displayed.",
+    "The test will start as soon as you press 'Ok'. You will be prompted to speak out the letter, so get in position and ask your companion to press 'Ok' for you once you are comfortable.",
+  ];
+
   Future<void> _onSignOut() async {
     await FirebaseAuth.instance.signOut();
+  }
+
+  Future<void> _launchUrl() async {
+    if (!await launchUrl(_url, mode: LaunchMode.externalApplication)) {
+      throw Exception('Could not launch $_url');
+    }
   }
 
   @override
@@ -154,12 +181,14 @@ class _HomePageState extends State<HomePage> {
                   context: context,
                   builder: (context) {
                     return AlertDialog(
-                      content: const Text(
-                        """
-Hold the phone a minimum of 10 ft away. We request you to take the help of a companion. 
-
-Press 'Ok' when you are ready.
-""",
+                      title:
+                          const Text('Please read the instructions carefully.'),
+                      content: SingleChildScrollView(
+                        child: BulletedList(
+                          listItems: _listOfInstructions,
+                          // listOrder: ListOrder.ordered,
+                          bulletType: BulletType.numbered,
+                        ),
                       ),
                       actions: [
                         TextButton(
@@ -186,38 +215,41 @@ Press 'Ok' when you are ready.
                 );
               },
             ),
-            Card(
-              elevation: 8,
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(
-                  Radius.circular(12),
+            InkWell(
+              child: Card(
+                elevation: 8,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(12),
+                  ),
+                ),
+                child: Container(
+                  padding: const EdgeInsets.all(12.0),
+                  width: MediaQuery.of(context).size.width,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text(
+                        'Nearby Clinics',
+                        style: TextStyle(
+                          fontSize: 18,
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                        'Check for nearby opthalmologists',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              child: Container(
-                padding: const EdgeInsets.all(12.0),
-                width: MediaQuery.of(context).size.width,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text(
-                      'Simulate Vision',
-                      style: TextStyle(
-                        fontSize: 18,
-                      ),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Text(
-                      'Your vision under simulation',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              onTap: _launchUrl,
             ),
           ],
         ),
