@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../Measure/measure_acuity.dart';
+
 class HomePage extends StatefulWidget {
   final String? title;
 
@@ -112,38 +114,77 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            Card(
-              elevation: 8,
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(
-                  Radius.circular(12),
+            InkWell(
+              child: Card(
+                elevation: 8,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(12),
+                  ),
+                ),
+                child: Container(
+                  padding: const EdgeInsets.all(12.0),
+                  width: MediaQuery.of(context).size.width,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text(
+                        'Measure Visual Acuity',
+                        style: TextStyle(
+                          fontSize: 18,
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                        'Check your visual acuity',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              child: Container(
-                padding: const EdgeInsets.all(12.0),
-                width: MediaQuery.of(context).size.width,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text(
-                      'Measure Visual Acuity',
-                      style: TextStyle(
-                        fontSize: 18,
+              onTap: () {
+                showDialog(
+                  barrierDismissible: false,
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      content: const Text(
+                        """
+Hold the phone a minimum of 10 ft away. We request you to take the help of a companion. 
+
+Press 'Ok' when you are ready.
+""",
                       ),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Text(
-                      'Check your visual acuity',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+                      actions: [
+                        TextButton(
+                          child: const Text('Ok'),
+                          onPressed: () {
+                            Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(
+                                builder: (buildContext) {
+                                  return const MeasureAcuity();
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('Cancel'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
             ),
             Card(
               elevation: 8,
