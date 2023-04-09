@@ -1,11 +1,11 @@
-import 'package:eye_suggest/Screens/Measure/measure_acuity_left.dart';
+import 'package:eye_suggest/Screens/Measure/measure_acuity_right_eye.dart';
 import 'package:flutter/material.dart';
 
 class LeftEyeInstruction extends StatefulWidget {
-  final int rightEyeScore;
+  final int leftEyeScore;
   const LeftEyeInstruction({
     Key? key,
-    required this.rightEyeScore,
+    required this.leftEyeScore,
   }) : super(key: key);
 
   @override
@@ -57,8 +57,8 @@ class _LeftEyeInstructionState extends State<LeftEyeInstruction> {
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
                       builder: (context) {
-                        return MeasureAcuityLeft(
-                          rightEyeScore: widget.rightEyeScore,
+                        return MeasureAcuityRightEye(
+                          leftEyeScore: widget.leftEyeScore,
                         );
                       },
                     ),

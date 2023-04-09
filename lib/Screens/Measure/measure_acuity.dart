@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'package:eye_suggest/Screens/Measure/left_eye_instruction.dart';
 import 'package:eye_suggest/SnellenChart/snellen_chart_widget.dart';
@@ -14,8 +15,9 @@ class MeasureAcuity extends StatefulWidget {
 
 class _MeasureAcuityState extends State<MeasureAcuity> {
   // state variables
-  var _text = '70', _isSpeechActive = false, _snellenLetter = '';
+  var _text = '', _isSpeechActive = false, _snellenLetter = '';
   int _correctRead = 0, _incorrectRead = 0, _rowCount = 0, _sizeOfChart = 70;
+  var _isTryAgain = false;
 
   // speech-to-text identifier
   final _speech = SpeechToText();
@@ -31,7 +33,8 @@ class _MeasureAcuityState extends State<MeasureAcuity> {
     var isSpeechActive = await _speech.initialize(
       onError: (_) {
         // prompt the user to try again
-        tryAgain();
+        // tryAgain();
+        alternateTryAgain();
       },
     );
 
@@ -41,10 +44,10 @@ class _MeasureAcuityState extends State<MeasureAcuity> {
     });
 
     // call the listen function
-    await _convertSpeechToText();
+    _convertSpeechToText();
   }
 
-  Future<void> _convertSpeechToText() async {
+  void _convertSpeechToText() async {
     if (_isSpeechActive) {
       // prompt the user to speak
       // -----------------
@@ -162,7 +165,8 @@ class _MeasureAcuityState extends State<MeasureAcuity> {
         }
       } else {
         // prompt the user to try again
-        tryAgain();
+        // tryAgain();
+        alternateTryAgain();
       }
     }
   }
@@ -195,46 +199,87 @@ class _MeasureAcuityState extends State<MeasureAcuity> {
     }
 
     // navigate to the left-eye instruction page
-    Navigator.of(context).pushReplacement(
+    Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) {
           return LeftEyeInstruction(
-            rightEyeScore: scoreSize,
+            leftEyeScore: scoreSize,
           );
         },
       ),
     );
   }
 
-  void tryAgain() async {
-    await showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (dialogContext) {
-        // to dismiss the dialog box automatically
-        Future.delayed(const Duration(seconds: 3), () {
-          Navigator.of(context).pop(true);
-        });
-
-        // the dialog box
-        return AlertDialog(
-          title: const Text(
+  Widget tryAgainWidget() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text(
             'Try Again',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 28,
             ),
           ),
-          content: Image.asset(
+          const SizedBox(
+            height: 15,
+          ),
+          Image.asset(
             'assets/images/try_again.png',
           ),
-        );
-      },
+        ],
+      ),
     );
-
-    // listen again
-    _activateSpeechToText();
   }
+
+  void alternateTryAgain() async {
+    await _speech.cancel();
+    setState(() {
+      _isTryAgain = true;
+    });
+    Timer(const Duration(seconds: 3), () {
+      setState(() {
+        _isTryAgain = false;
+      });
+      _activateSpeechToText();
+    });
+  }
+
+  // void tryAgain() async {
+  //   await _speech.cancel();
+  //   await showDialog(
+  //     barrierDismissible: false,
+  //     context: context,
+  //     builder: (dialogContext) {
+  //       // to dismiss the dialog box automatically
+  //       Timer(const Duration(seconds: 3), () {
+  //         Navigator.pop(dialogContext);
+  //       });
+
+  //       // Future.delayed(const Duration(seconds: 3), () {
+  //       //   Navigator.of(context).pop(true);
+  //       // });
+
+  //       // the dialog box
+  //       return AlertDialog(
+  //         title: const Text(
+  //           'Try Again',
+  //           textAlign: TextAlign.center,
+  //           style: TextStyle(
+  //             fontSize: 28,
+  //           ),
+  //         ),
+  //         content: Image.asset(
+  //           'assets/images/try_again.png',
+  //         ),
+  //       );
+  //     },
+  //   );
+
+  //   // listen again
+  //   _activateSpeechToText();
+  // }
 
   String getSnellenLetter(int length) {
     // the list of characters
@@ -262,32 +307,34 @@ class _MeasureAcuityState extends State<MeasureAcuity> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Letter: ' + (_rowCount + 1).toString(),
-              style: const TextStyle(
-                fontSize: 22,
+      body: _isTryAgain
+          ? tryAgainWidget()
+          : Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Letter: ' + (_rowCount + 1).toString(),
+                    style: const TextStyle(
+                      fontSize: 22,
+                    ),
+                  ),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.1,
+                  ),
+                  SnellenChartWidget(
+                    feet: _sizeOfChart,
+                    letterToDisplay: _snellenLetter,
+                  ),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.1,
+                  ),
+                  Text(
+                    _text,
+                  ),
+                ],
               ),
             ),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.1,
-            ),
-            SnellenChartWidget(
-              feet: _sizeOfChart,
-              letterToDisplay: _snellenLetter,
-            ),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.1,
-            ),
-            Text(
-              _text,
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

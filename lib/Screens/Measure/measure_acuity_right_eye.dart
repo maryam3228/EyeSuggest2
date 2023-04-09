@@ -1,44 +1,47 @@
+import 'dart:async';
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eye_suggest/Screens/ShowScore/show_score.dart';
-import 'package:eye_suggest/SnellenChart/snellen_chart_widget.dart';
+import 'package:eye_suggest/SnellenChart/snellen_chart_right.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
-class MeasureAcuityLeft extends StatefulWidget {
-  final int rightEyeScore;
-  const MeasureAcuityLeft({
+class MeasureAcuityRightEye extends StatefulWidget {
+  final int leftEyeScore;
+  const MeasureAcuityRightEye({
     Key? key,
-    required this.rightEyeScore,
+    required this.leftEyeScore,
   }) : super(key: key);
 
   @override
-  State<MeasureAcuityLeft> createState() => _MeasureAcuityLeftState();
+  State<MeasureAcuityRightEye> createState() => _MeasureAcuityRightEyeState();
 }
 
-class _MeasureAcuityLeftState extends State<MeasureAcuityLeft> {
+class _MeasureAcuityRightEyeState extends State<MeasureAcuityRightEye> {
   // state variables
-  var _text = '70', _isSpeechActive = false, _snellenLetter = '';
+  var _text = '', _isSpeechActive = false, _snellenLetter = '';
   int _correctRead = 0, _incorrectRead = 0, _rowCount = 0, _sizeOfChart = 70;
+  var _isTryAgain = false;
 
   // speech-to-text identifier
-  final _speech = SpeechToText();
+  final _speechRight = SpeechToText();
 
   // activate speech-to-text module
-  void _activateSpeechToText() async {
+  void _activateSpeechToTextRight() async {
     // generate the letter to display
     setState(() {
-      _snellenLetter = getSnellenLetter(1);
+      _snellenLetter = getSnellenLetterRight(1);
     });
 
     // initialize speech to text function
-    var isSpeechActive = await _speech.initialize(
+    var isSpeechActive = await _speechRight.initialize(
       onError: (_) {
         // prompt the user to try again
-        tryAgain();
+        // tryAgain();
+        alternateTryAgainRight();
       },
     );
 
@@ -48,24 +51,24 @@ class _MeasureAcuityLeftState extends State<MeasureAcuityLeft> {
     });
 
     // call the listen function
-    await _convertSpeechToText();
+    _convertSpeechToTextRight();
   }
 
-  Future<void> _convertSpeechToText() async {
+  void _convertSpeechToTextRight() async {
     if (_isSpeechActive) {
       // prompt the user to speak
       // -----------------
 
       // start listening
-      await _speech.listen(
+      await _speechRight.listen(
         onResult: (result) {
-          _onResult(result);
+          _onResultRight(result);
         },
       );
     } else {
       showDialog(
         context: context,
-        builder: (dialogContext) {
+        builder: (context) {
           return AlertDialog(
             title: const Text('Speech Recognition Inactive'),
             content: const Text(
@@ -89,7 +92,7 @@ class _MeasureAcuityLeftState extends State<MeasureAcuityLeft> {
     }
   }
 
-  void _onResult(SpeechRecognitionResult result) async {
+  void _onResultRight(SpeechRecognitionResult result) async {
     if (result.finalResult) {
       // get the result and update the state variable
       var recognizedText = result.recognizedWords;
@@ -121,7 +124,7 @@ class _MeasureAcuityLeftState extends State<MeasureAcuityLeft> {
         // show 3 letters in each row
         if (_rowCount < 3) {
           // listen for 3 times in a row
-          _activateSpeechToText();
+          _activateSpeechToTextRight();
         } else {
           // change the size of the chart
           // check the correct inputs
@@ -156,25 +159,26 @@ class _MeasureAcuityLeftState extends State<MeasureAcuityLeft> {
                 _sizeOfChart = 4;
               } else {
                 // end the test
-                endTest();
+                endTestRight();
               }
             });
 
             // listen again
-            _activateSpeechToText();
+            _activateSpeechToTextRight();
           } else {
             // end the test
-            endTest();
+            endTestRight();
           }
         }
       } else {
         // prompt the user to try again
-        tryAgain();
+        // tryAgain();
+        alternateTryAgainRight();
       }
     }
   }
 
-  void endTest() {
+  void endTestRight() {
     // set the size at which the user was able to corectly read the entire row
     var scoreSize = 0;
     if (_sizeOfChart == 70) {
@@ -206,8 +210,8 @@ class _MeasureAcuityLeftState extends State<MeasureAcuityLeft> {
       MaterialPageRoute(
         builder: (context) {
           return ShowScore(
-            rightEyeScore: widget.rightEyeScore,
-            leftEyeScore: scoreSize,
+            rightEyeScore: scoreSize,
+            leftEyeScore: widget.leftEyeScore,
           );
         },
       ),
@@ -220,42 +224,83 @@ class _MeasureAcuityLeftState extends State<MeasureAcuityLeft> {
         .collection('Scores')
         .doc(DateFormat('dd-MM-yyyy hh:mm:ss').format(DateTime.now()))
         .set({
-      'right_eye_score': '10 / ${widget.rightEyeScore}',
-      'left_eye_score': '10 / $scoreSize',
+      'right_eye_score': '10 / $scoreSize ',
+      'left_eye_score': '10 / ${widget.leftEyeScore}',
     });
   }
 
-  void tryAgain() async {
-    await showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (dialogContext) {
-        // to dismiss the dialog box automatically
-        Future.delayed(const Duration(seconds: 3), () {
-          Navigator.of(context).pop(true);
-        });
-
-        // the dialog box
-        return AlertDialog(
-          title: const Text(
+  Widget tryAgainWidgetRight() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text(
             'Try Again',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 28,
             ),
           ),
-          content: Image.asset(
+          const SizedBox(
+            height: 15,
+          ),
+          Image.asset(
             'assets/images/try_again.png',
           ),
-        );
-      },
+        ],
+      ),
     );
-
-    // listen again
-    _activateSpeechToText();
   }
 
-  String getSnellenLetter(int length) {
+  void alternateTryAgainRight() async {
+    await _speechRight.cancel();
+    setState(() {
+      _isTryAgain = true;
+    });
+    Timer(const Duration(seconds: 3), () {
+      setState(() {
+        _isTryAgain = false;
+      });
+      _activateSpeechToTextRight();
+    });
+  }
+
+  // void tryAgain() async {
+  //   await _speech.cancel();
+  //   await showDialog(
+  //     barrierDismissible: false,
+  //     context: context,
+  //     builder: (dialogContext) {
+  //       // to dismiss the dialog box automatically
+  //       Timer(const Duration(seconds: 3), () {
+  //         Navigator.pop(dialogContext);
+  //       });
+
+  //       // Future.delayed(const Duration(seconds: 3), () {
+  //       //   Navigator.of(context).pop(true);
+  //       // });
+
+  //       // the dialog box
+  //       return AlertDialog(
+  //         title: const Text(
+  //           'Try Again',
+  //           textAlign: TextAlign.center,
+  //           style: TextStyle(
+  //             fontSize: 28,
+  //           ),
+  //         ),
+  //         content: Image.asset(
+  //           'assets/images/try_again.png',
+  //         ),
+  //       );
+  //     },
+  //   );
+
+  //   // listen again
+  //   _activateSpeechToText();
+  // }
+
+  String getSnellenLetterRight(int length) {
     // the list of characters
     const _chars = 'ABCDEFGHIJKLMNOPQRSTVWXYZ';
 
@@ -275,38 +320,40 @@ class _MeasureAcuityLeftState extends State<MeasureAcuityLeft> {
   @override
   void initState() {
     super.initState();
-    _activateSpeechToText();
+    _activateSpeechToTextRight();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Letter: ' + (_rowCount + 1).toString(),
-              style: const TextStyle(
-                fontSize: 22,
+      body: _isTryAgain
+          ? tryAgainWidgetRight()
+          : Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Letter: ' + (_rowCount + 1).toString(),
+                    style: const TextStyle(
+                      fontSize: 22,
+                    ),
+                  ),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.1,
+                  ),
+                  SnellenChartRight(
+                    feet: _sizeOfChart,
+                    letterToDisplay: _snellenLetter,
+                  ),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.1,
+                  ),
+                  Text(
+                    _text,
+                  ),
+                ],
               ),
             ),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.1,
-            ),
-            SnellenChartWidget(
-              feet: _sizeOfChart,
-              letterToDisplay: _snellenLetter,
-            ),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.1,
-            ),
-            Text(
-              _text,
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
