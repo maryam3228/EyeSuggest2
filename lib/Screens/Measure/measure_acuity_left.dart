@@ -1,18 +1,25 @@
 import 'dart:math';
-import 'package:eye_suggest/Screens/Measure/left_eye_instruction.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:eye_suggest/Screens/ShowScore/show_score.dart';
 import 'package:eye_suggest/SnellenChart/snellen_chart_widget.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
-class MeasureAcuity extends StatefulWidget {
-  const MeasureAcuity({Key? key}) : super(key: key);
+class MeasureAcuityLeft extends StatefulWidget {
+  final int rightEyeScore;
+  const MeasureAcuityLeft({
+    Key? key,
+    required this.rightEyeScore,
+  }) : super(key: key);
 
   @override
-  State<MeasureAcuity> createState() => _MeasureAcuityState();
+  State<MeasureAcuityLeft> createState() => _MeasureAcuityLeftState();
 }
 
-class _MeasureAcuityState extends State<MeasureAcuity> {
+class _MeasureAcuityLeftState extends State<MeasureAcuityLeft> {
   // state variables
   var _text = '70', _isSpeechActive = false, _snellenLetter = '';
   int _correctRead = 0, _incorrectRead = 0, _rowCount = 0, _sizeOfChart = 70;
@@ -194,16 +201,28 @@ class _MeasureAcuityState extends State<MeasureAcuity> {
       scoreSize = 4;
     }
 
-    // navigate to the left-eye instruction page
+    // navigate to the score page
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (context) {
-          return LeftEyeInstruction(
-            rightEyeScore: scoreSize,
+          return ShowScore(
+            rightEyeScore: widget.rightEyeScore,
+            leftEyeScore: scoreSize,
           );
         },
       ),
     );
+
+    // push the score on to firebase
+    FirebaseFirestore.instance
+        .collection('Users')
+        .doc(FirebaseAuth.instance.currentUser!.email)
+        .collection('Scores')
+        .doc(DateFormat('dd-MM-yyyy hh:mm:ss').format(DateTime.now()))
+        .set({
+      'right_eye_score': '10 / ${widget.rightEyeScore}',
+      'left_eye_score': '10 / $scoreSize',
+    });
   }
 
   void tryAgain() async {

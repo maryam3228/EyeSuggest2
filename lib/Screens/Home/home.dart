@@ -1,10 +1,9 @@
 import 'package:bulleted_list/bulleted_list.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:eye_suggest/Screens/Measure/right_eye_instruction.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-import '../Measure/measure_acuity.dart';
 
 class HomePage extends StatefulWidget {
   final String? title;
@@ -34,7 +33,9 @@ class _HomePageState extends State<HomePage> {
     "You have to strictly say the phrase 'THE LETTER X' while speaking out the letter identified, where X represents the letter that will be displayed on the screen during the test.",
     "If you fail to speak out the complete phrase, you will be prompted to try again.",
     "If at any point you are unable to read out the letters displayed, guess and speak out any random letter, in the same phrase format.",
-    "Once the test has successfully completed, the score will be displayed.",
+    "You have to attempt the test twice, for one eye at time. Please attempt the test with your right eye first and cover your left eye with a plain occluder, card or a tissue. Do not press on your eye. Repeat the entire process for left eye.",
+    "It is important that you follow the order for the test, i.e., right eye first and left eye second.",
+    "Once the test has successfully completed, the score for the respective eye will be displayed.",
     "The test will start as soon as you press 'Ok'. You will be prompted to speak out the letter, so get in position and ask your companion to press 'Ok' for you once you are comfortable.",
   ];
 
@@ -186,7 +187,6 @@ class _HomePageState extends State<HomePage> {
                       content: SingleChildScrollView(
                         child: BulletedList(
                           listItems: _listOfInstructions,
-                          // listOrder: ListOrder.ordered,
                           bulletType: BulletType.numbered,
                         ),
                       ),
@@ -197,7 +197,7 @@ class _HomePageState extends State<HomePage> {
                             Navigator.of(context).pushReplacement(
                               MaterialPageRoute(
                                 builder: (buildContext) {
-                                  return const MeasureAcuity();
+                                  return const RightEyeInstruction();
                                 },
                               ),
                             );
