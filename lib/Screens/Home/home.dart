@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eye_suggest/Screens/Instructions/instructions.dart';
+import 'package:eye_suggest/Screens/SimulateVision/simulate_vision.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -162,6 +163,50 @@ class _HomePageState extends State<HomePage> {
                   MaterialPageRoute(
                     builder: (context) {
                       return const Instructions();
+                    },
+                  ),
+                );
+              },
+            ),
+            InkWell(
+              child: Card(
+                elevation: 8,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(12),
+                  ),
+                ),
+                child: Container(
+                  padding: const EdgeInsets.all(12.0),
+                  width: MediaQuery.of(context).size.width,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text(
+                        'Simulate Vision',
+                        style: TextStyle(
+                          fontSize: 18,
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                        'Your vision under simulation',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return const SimulateVision();
                     },
                   ),
                 );
