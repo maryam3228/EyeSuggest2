@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'dart:math';
-import 'package:eye_suggest/Screens/Measure/left_eye_instruction.dart';
+import 'package:eye_suggest/Screens/ShowScore/show_score.dart';
 import 'package:eye_suggest/SnellenChart/snellen_chart_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
+import 'package:wakelock/wakelock.dart';
 
 class MeasureAcuity extends StatefulWidget {
   const MeasureAcuity({Key? key}) : super(key: key);
@@ -17,7 +18,8 @@ class _MeasureAcuityState extends State<MeasureAcuity> {
   // state variables
   var _text = '', _isSpeechActive = false, _snellenLetter = '';
   int _correctRead = 0, _incorrectRead = 0, _rowCount = 0, _sizeOfChart = 70;
-  var _isTryAgain = false;
+  var _isTryAgain = false, _coverLeftEye = false, _testingRightEye = false;
+  var _leftEyeScore = 0, _rightEyeScore = 0;
 
   // speech-to-text identifier
   final _speech = SpeechToText();
@@ -26,7 +28,7 @@ class _MeasureAcuityState extends State<MeasureAcuity> {
   void _activateSpeechToText() async {
     // generate the letter to display
     setState(() {
-      _snellenLetter = getSnellenLetter(1);
+      _snellenLetter = _getSnellenLetter(1);
     });
 
     // initialize speech to text function
@@ -34,7 +36,7 @@ class _MeasureAcuityState extends State<MeasureAcuity> {
       onError: (_) {
         // prompt the user to try again
         // tryAgain();
-        alternateTryAgain();
+        _tryAgain();
       },
     );
 
@@ -49,9 +51,6 @@ class _MeasureAcuityState extends State<MeasureAcuity> {
 
   void _convertSpeechToText() async {
     if (_isSpeechActive) {
-      // prompt the user to speak
-      // -----------------
-
       // start listening
       await _speech.listen(
         onResult: (result) {
@@ -119,11 +118,9 @@ class _MeasureAcuityState extends State<MeasureAcuity> {
           // listen for 3 times in a row
           _activateSpeechToText();
         } else {
-          // change the size of the chart
-          // check the correct inputs
+          // change the size of the chart and check the correct inputs
           if (_incorrectRead <= _correctRead) {
-            // decrease the size
-            // reset the state variables
+            // decrease the size and reset the state variables
             setState(() {
               _isSpeechActive = false;
               _snellenLetter = '';
@@ -131,7 +128,7 @@ class _MeasureAcuityState extends State<MeasureAcuity> {
               _incorrectRead = 0;
               _rowCount = 0;
 
-              // reset accordingly the sizeo of chart
+              // reset accordingly the size of chart
               if (_sizeOfChart == 70) {
                 _sizeOfChart = 60;
               } else if (_sizeOfChart == 60) {
@@ -152,7 +149,7 @@ class _MeasureAcuityState extends State<MeasureAcuity> {
                 _sizeOfChart = 4;
               } else {
                 // end the test
-                endTest();
+                _endTest();
               }
             });
 
@@ -160,20 +157,20 @@ class _MeasureAcuityState extends State<MeasureAcuity> {
             _activateSpeechToText();
           } else {
             // end the test
-            endTest();
+            _endTest();
           }
         }
       } else {
         // prompt the user to try again
-        // tryAgain();
-        alternateTryAgain();
+        _tryAgain();
       }
     }
   }
 
-  void endTest() {
+  void _endTest() async {
     // set the size at which the user was able to corectly read the entire row
     var scoreSize = 0;
+
     if (_sizeOfChart == 70) {
       scoreSize = 0;
     } else if (_sizeOfChart == 60) {
@@ -198,19 +195,98 @@ class _MeasureAcuityState extends State<MeasureAcuity> {
       scoreSize = 4;
     }
 
-    // navigate to the left-eye instruction page
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) {
-          return LeftEyeInstruction(
-            leftEyeScore: scoreSize,
-          );
-        },
+    if (!_testingRightEye) {
+      _leftEyeScore = scoreSize;
+    } else {
+      _rightEyeScore = scoreSize;
+    }
+
+    setState(() {
+      _testingRightEye = !_testingRightEye;
+    });
+
+    await _speech.stop();
+
+    if (_testingRightEye) {
+      // prompt to cover the left-eye
+      setState(() {
+        _coverLeftEye = true;
+        _isSpeechActive = false;
+        _snellenLetter = '';
+        _correctRead = 0;
+        _incorrectRead = 0;
+        _rowCount = 0;
+        _sizeOfChart = 70;
+        _text = '';
+      });
+
+      // drop after 10 seconds
+      Timer(const Duration(seconds: 10), () {
+        setState(() {
+          _coverLeftEye = false;
+        });
+
+        // start the test for right-eye
+        _activateSpeechToText();
+      });
+    } else {
+      // navigate to show score Page
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) {
+            return ShowScore(
+              rightEyeScore: _rightEyeScore,
+              leftEyeScore: _leftEyeScore,
+            );
+          },
+        ),
+      );
+    }
+  }
+
+  Widget _coverLeftEyeInstruction() {
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Text(
+                'Please cover your left eye.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 22,
+                ),
+              ),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.03,
+              ),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.4,
+                child: Image.asset(
+                  'assets/images/Lefteye.png',
+                  fit: BoxFit.fitHeight,
+                ),
+              ),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.03,
+              ),
+              const Text(
+                "Test will start in 10 seconds",
+                style: TextStyle(
+                  fontSize: 22,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  Widget tryAgainWidget() {
+  Widget _tryAgainWidget() {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -233,11 +309,11 @@ class _MeasureAcuityState extends State<MeasureAcuity> {
     );
   }
 
-  void alternateTryAgain() async {
-    await _speech.cancel();
+  void _tryAgain() async {
     setState(() {
       _isTryAgain = true;
     });
+    await _speech.stop();
     Timer(const Duration(seconds: 3), () {
       setState(() {
         _isTryAgain = false;
@@ -246,53 +322,18 @@ class _MeasureAcuityState extends State<MeasureAcuity> {
     });
   }
 
-  // void tryAgain() async {
-  //   await _speech.cancel();
-  //   await showDialog(
-  //     barrierDismissible: false,
-  //     context: context,
-  //     builder: (dialogContext) {
-  //       // to dismiss the dialog box automatically
-  //       Timer(const Duration(seconds: 3), () {
-  //         Navigator.pop(dialogContext);
-  //       });
-
-  //       // Future.delayed(const Duration(seconds: 3), () {
-  //       //   Navigator.of(context).pop(true);
-  //       // });
-
-  //       // the dialog box
-  //       return AlertDialog(
-  //         title: const Text(
-  //           'Try Again',
-  //           textAlign: TextAlign.center,
-  //           style: TextStyle(
-  //             fontSize: 28,
-  //           ),
-  //         ),
-  //         content: Image.asset(
-  //           'assets/images/try_again.png',
-  //         ),
-  //       );
-  //     },
-  //   );
-
-  //   // listen again
-  //   _activateSpeechToText();
-  // }
-
-  String getSnellenLetter(int length) {
+  String _getSnellenLetter(int length) {
     // the list of characters
     const _chars = 'ABCDEFGHIJKLMNOPQRSTVWXYZ';
 
     // initialize the random class
-    Random _rnd = Random();
+    Random random = Random();
 
     return String.fromCharCodes(
       Iterable.generate(
         length,
         (_) => _chars.codeUnitAt(
-          _rnd.nextInt(_chars.length),
+          random.nextInt(_chars.length),
         ),
       ),
     );
@@ -306,35 +347,40 @@ class _MeasureAcuityState extends State<MeasureAcuity> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _isTryAgain
-          ? tryAgainWidget()
-          : Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Letter: ' + (_rowCount + 1).toString(),
-                    style: const TextStyle(
-                      fontSize: 22,
+    // disbale screen-timeout
+    Wakelock.enable();
+
+    return _coverLeftEye
+        ? _coverLeftEyeInstruction()
+        : Scaffold(
+            body: _isTryAgain
+                ? _tryAgainWidget()
+                : Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Letter: ' + (_rowCount + 1).toString(),
+                          style: const TextStyle(
+                            fontSize: 22,
+                          ),
+                        ),
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.1,
+                        ),
+                        SnellenChartWidget(
+                          feet: _sizeOfChart,
+                          letterToDisplay: _snellenLetter,
+                        ),
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.1,
+                        ),
+                        Text(
+                          _text,
+                        ),
+                      ],
                     ),
                   ),
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.1,
-                  ),
-                  SnellenChartWidget(
-                    feet: _sizeOfChart,
-                    letterToDisplay: _snellenLetter,
-                  ),
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.1,
-                  ),
-                  Text(
-                    _text,
-                  ),
-                ],
-              ),
-            ),
-    );
+          );
   }
 }

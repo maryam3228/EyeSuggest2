@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:eye_suggest/Screens/Home/instructions.dart';
+import 'package:eye_suggest/Screens/Instructions/instructions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -19,24 +19,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final Uri _url =
       Uri.parse('https://www.google.com/maps/search/ophthalmologist near me');
-
-  final _listOfInstructions = [
-    "It's recommended to take help of a companion in holding the smartphone 10 feet away from you. Maintaining the distance is crucial for the test.",
-    "The Snellen's Chart will be displayed on the screen.",
-    "Three letters will be displayed from each row of the Snellen's Chart.",
-    "Speak out the letter displayed on the screen. If you read correctly, the next letter will be shown.",
-    "For every row in the Snellen's Chart, three letters will be displayed one-by-one. After that, the size of the letters will decrease, i.e., next row of the Snellen's Chart will be displayed.",
-    "The test will end if you are unable to guess 2 out of 3 letters displayed.",
-    "If there is some disturbance in recognizing your speech, you will be prompted to try again speaking the letter displayed on the screen.",
-    "You are recommended to wear Bluetooth headphones for ease of speech recognition.",
-    "You have to strictly say the phrase 'THE LETTER X' while speaking out the letter identified, where X represents the letter that will be displayed on the screen during the test.",
-    "If you fail to speak out the complete phrase, you will be prompted to try again.",
-    "If at any point you are unable to read out the letters displayed, guess and speak out any random letter, in the same phrase format.",
-    "You have to attempt the test twice, for one eye at time. Please attempt the test with your left eye first and cover your right eye with a plain occluder, card or a tissue. Do not press on your eye. Repeat the entire process for right eye.",
-    "It is important that you follow the order for the test, i.e., left eye first and right eye second.",
-    "Once the test has successfully completed, the score for the respective eye will be displayed.",
-    "The test will start as soon as you press 'Ok'. You will be prompted to speak out the letter, so get in position and ask your companion to press 'Ok' for you once you are comfortable.",
-  ];
 
   Future<void> _onSignOut() async {
     await FirebaseAuth.instance.signOut();
@@ -179,9 +161,7 @@ class _HomePageState extends State<HomePage> {
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) {
-                      return Instructions(
-                        listOfInstructions: _listOfInstructions,
-                      );
+                      return const Instructions();
                     },
                   ),
                 );
