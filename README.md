@@ -37,26 +37,6 @@ The algorithm used in the application follows the steps below to conduct visual 
 
 # EyeSuggest - The Mobile App Solution Proposed
 
-This section comprises the screenshots from our app, EyeSuggest, the proposed mobile app solution for measuring visual acuity. 
-
-## Log-In / Sign-Up Page and Services Page
-The user is first asked to sign-in or sign-up for the app and then navigated to the home page after successful sign-up. The home page has our modules of Measure Visual Acuity, Simulate Vision, and Nearby Clinics.
-
-![image](https://github.com/Zafar7645/EyeSuggest/assets/73229846/ca70ee99-b270-46e0-8f3c-d433e5e6f2b0)  ![image](https://github.com/Zafar7645/EyeSuggest/assets/73229846/0135bcc9-5727-4b4a-838b-2926d933ccba)
-
-## Instructions Page
-The instructions page has all the necessary instructions that the user needs to strictly abide to. Further the user is instructed to cover the right eye and conduct the test for the left eye.
-
-![image](https://github.com/Zafar7645/EyeSuggest/assets/73229846/10b22edc-3f04-4000-96c1-5f9ed276d3c9)
-
-## Snellen Chart
-
-
-
-
- 
-
-
 # Analysis
 
 A group of individuals was tested using both the traditional method and the developed mobile application for visual acuity tests. The results showed that the application provided more accurate results for the age group between 10-20 years old, while the outcomes of the application deviated from the outcomes of the traditional methods for the elderly population. This deviation could be attributed to age-related changes in the eye's lens and underlying health conditions affecting visual acuity in the elderly population.
