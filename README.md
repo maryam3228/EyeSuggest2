@@ -47,19 +47,19 @@ To visualize the comparison between the traditional method and the application m
 
 ## Graph showing the blurriness percentage obtained from traditional method and our app with respect to age
 
-![image](https://github.com/Zafar7645/EyeSuggest/assets/73229846/a6fe87fa-6866-4a19-8330-0008486b924f)
+![image](https://github.com/Zafar7645/EyeSuggest/assets/73229846/db6375ff-286f-4b3e-8343-05c3eebc972d)
 
 ## Comparison of Visual Acuity Scores (left eye and right eye) for different ages collected from traditional method
 
-![image](https://github.com/Zafar7645/EyeSuggest/assets/73229846/6eb0b919-5177-4e99-a87f-36972a022a1c)
+![image](https://github.com/Zafar7645/EyeSuggest/assets/73229846/26887c49-3ba1-4385-b217-845feceb1f3c)
 
 ## Comparison of Visual Acuity Scores (left eye and right eye) for different ages collected from the app
 
-![image](https://github.com/Zafar7645/EyeSuggest/assets/73229846/e7c740dd-9fa8-4f29-8b01-823c51c9d044)
+![image](https://github.com/Zafar7645/EyeSuggest/assets/73229846/18c96374-409a-4d10-a0df-9dca147b7458)
 
 ## Average of traditional method’s acuity score with app’s acuity score with respect to age 
 
-![image](https://github.com/Zafar7645/EyeSuggest/assets/73229846/7444b11a-63b2-4172-bfa0-31c517d80bc3)
+![image](https://github.com/Zafar7645/EyeSuggest/assets/73229846/aab8c74a-897c-41be-8e81-99a2a46f3983)
 
 # Conclusion
 
