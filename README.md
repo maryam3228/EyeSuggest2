@@ -37,7 +37,7 @@ The algorithm used in the application follows the steps below to conduct visual 
 
 # EyeSuggest - The Mobile Application
 
-https://github.com/Zafar7645/EyeSuggest/assets/73229846/0591baf2-142e-4c4d-af66-824f054df48f
+https://github.com/Zafar7645/EyeSuggest/assets/73229846/6d7b0f08-09f9-4b60-a925-6e38df6da05c
 
 # Analysis
 
