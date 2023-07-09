@@ -85,4 +85,8 @@ The proposed solution for measuring visual acuity using a mobile application has
 
 [7] Patel, N. A., Alagappan, P. N., Pan, C., & Karth, P. (2020). A mobile vision testing application based on dynamic distance determination from the human corneal Limbus. Health Informatics Journal, 26(4), 3037–3055.
 
-[8] Perera, C., Chakrabarti, R., Islam, F. M., & Crowston, J. (2015).
+[8]	C. Perera, R. Chakrabarti, F. M. Islam, and J. Crowston, “The eye phone study: Reliability and accuracy of assessing snellen visual acuity using smartphone technology,” Eye, vol. 29, no. 7, pp. 888–894, 2015.
+
+[9]	A. De Bortoli and O. Gaggi, “Playwitheyes: A new way to test children eyes,” 2011 IEEE 1st International Conference on Serious Games and Applications for Health (SeGAH), 2011.  
+
+[10]	A.-H. Chen, F. N. N. Norazman, and N. H. Buari, “Comparison of visual acuity estimates using three different letter charts under two ambient room illuminations,” Indian Journal of Ophthalmology, vol. 60, no. 2, p. 101, 2012.  
