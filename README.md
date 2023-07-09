@@ -35,8 +35,6 @@ The algorithm used in the application follows the steps below to conduct visual 
 - Calculate the user's visual acuity score using the formula: visual acuity = 10 / letter-size, where the letter-size is the size of the smallest line marked on the Snellen Chart that the user correctly identified the letters, and 10 is the actual distance between the user and the device in feet.
 - Display the visual acuity score to the user for both eyes.
 
-# EyeSuggest - The Mobile App Solution Proposed
-
 # Analysis
 
 A group of individuals was tested using both the traditional method and the developed mobile application for visual acuity tests. The results showed that the application provided more accurate results for the age group between 10-20 years old, while the outcomes of the application deviated from the outcomes of the traditional methods for the elderly population. This deviation could be attributed to age-related changes in the eye's lens and underlying health conditions affecting visual acuity in the elderly population.
