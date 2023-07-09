@@ -90,3 +90,9 @@ The proposed solution for measuring visual acuity using a mobile application has
 [9]	A. De Bortoli and O. Gaggi, “Playwitheyes: A new way to test children eyes,” 2011 IEEE 1st International Conference on Serious Games and Applications for Health (SeGAH), 2011.  
 
 [10]	A.-H. Chen, F. N. N. Norazman, and N. H. Buari, “Comparison of visual acuity estimates using three different letter charts under two ambient room illuminations,” Indian Journal of Ophthalmology, vol. 60, no. 2, p. 101, 2012.  
+
+
+# BlackBook
+Take a look at the detailed documentation for the project including the published and submiited for review research papers and the screenshots of the application - EyeSuggest, as the results.
+
+[EyeSuggest- BlackBook](https://drive.google.com/file/d/1CCKwdcG9bxpInvKIsu2Uxhfi9P-P6FK6/view?usp=sharing)
